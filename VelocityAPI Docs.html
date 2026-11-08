@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Velocity public-API Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="https://i.imgur.com/n8EDlbw.png">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#101012; --bg2:#151618; --bg3:#1c1d21; --fg:#ececef; --muted:#6f7280; --line:#222328; --line2:#2b2d33;
+  --accent:#ffffff; --accent-bg:#212227; --code-bg:#0c0c0e; --code-fg:#dcdde2;
+  --warn-bg:rgba(245,176,65,.07); --warn-line:rgba(245,176,65,.35); --info-bg:rgba(255,255,255,.03); --info-line:#2f3138;
+  --kw:#e58aa0; --ty:#7fd0c6; --str:#98c379; --cm:#5a5d68; --num:#e5b567;
+  --shadow:0 1px 0 rgba(255,255,255,.02) inset;
+}
+/* scrollbars */
+*{scrollbar-width:thin;scrollbar-color:#26282e transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#26282e;border-radius:999px;border:2px solid var(--bg)}
+nav#side::-webkit-scrollbar-thumb{border-color:#151618}
+::-webkit-scrollbar-thumb:hover{background:#3a3d46}
+::-webkit-scrollbar-corner{background:transparent}
+::selection{background:rgba(255,255,255,.18)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;-webkit-font-smoothing:antialiased;background:radial-gradient(1200px 600px at 50% -10%,#1a1b1f 0%,transparent 70%),var(--bg);background-attachment:fixed;color:var(--fg);font:15.5px/1.7 Poppins,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+/* top bar */
+header{position:fixed;inset:0 0 auto 0;height:60px;background:rgba(16,16,18,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 20px;z-index:30}
+.logo{display:flex;align-items:center;gap:12px;font-family:Inter,sans-serif;font-weight:700;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg)}.logo:hover{text-decoration:none}
+.logo img{width:28px;height:28px;object-fit:contain;display:block;background:none;border:0;border-radius:0}
+.ver{font-family:Poppins,sans-serif;font-size:11px;letter-spacing:.04em;font-weight:500;color:var(--muted);border:1px solid var(--line2);border-radius:999px;padding:2px 10px;text-transform:none}
+.spacer{flex:1}
+#search{width:min(320px,40vw);padding:9px 16px;border:1px solid var(--line);border-radius:999px;font-family:inherit;background:var(--bg2);color:var(--fg);font-size:14px}
+#search:focus{outline:none;border-color:#4a4d57;background:var(--bg2)}
+button.icon{border:1px solid var(--line);background:var(--bg2);color:var(--fg);border-radius:8px;height:36px;min-width:36px;cursor:pointer;font-size:15px}
+#menu{display:none}
+
+/* layout */
+nav#side{position:fixed;top:76px;bottom:16px;left:16px;width:264px;overflow:auto;border:1px solid var(--line);border-radius:20px;background:rgba(21,22,24,.9);padding:14px 12px 24px}
+nav#side h4{margin:18px 12px 6px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+nav#side a{display:block;padding:7px 14px;border-radius:12px;color:var(--fg);font-size:14.5px}
+nav#side a:hover{background:var(--bg3);text-decoration:none}
+nav#side a.active{background:var(--accent-bg);color:#fff;font-weight:500;box-shadow:inset 0 0 0 1px var(--line2)}
+nav#side a.sub{margin-left:12px;font-size:13.5px;color:var(--muted);font-family:ui-monospace,Menlo,monospace}
+nav#side a.hide{display:none}
+main{margin-left:296px;margin-right:240px;padding:90px 48px 80px;min-height:100vh}
+article{max-width:780px;margin:0 auto}
+aside#toc{position:fixed;top:60px;right:0;width:240px;bottom:0;overflow:auto;padding:90px 20px 30px;font-size:13.5px}
+aside#toc h5{margin:0 0 8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+aside#toc a{display:block;color:var(--muted);padding:3px 0 3px 12px;border-left:2px solid var(--line)}
+aside#toc a:hover{color:var(--fg);text-decoration:none}
+aside#toc a.on{color:#fff;border-left-color:#fff}
+
+/* content */
+.page{display:none}.page.show{display:block}
+h1{font-size:32px;font-weight:600;line-height:1.2;margin:0 0 10px;letter-spacing:-.01em}
+h2{font-size:22px;font-weight:600;margin:44px 0 12px;padding-top:10px;border-top:1px solid var(--line);letter-spacing:-.01em}
+h3{font-size:18px;margin:30px 0 8px}
+p.lead{font-size:16.5px;color:var(--muted);margin:0 0 24px}
+code{background:#1a1b1f;border:1px solid var(--line);padding:1px 6px;border-radius:6px;font-size:.88em}
+pre{position:relative;background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;overflow:auto;font-size:13.5px;line-height:1.6;margin:14px 0}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+pre .copy{font-family:inherit;position:absolute;top:8px;right:8px;font-size:12px;border:1px solid var(--line);background:var(--bg2);color:var(--muted);border-radius:6px;padding:2px 8px;cursor:pointer;opacity:0;transition:.15s}
+pre:hover .copy{opacity:1}
+.k{color:var(--kw)}.t{color:var(--ty)}.s{color:var(--str)}.c{color:var(--cm)}.n{color:var(--num)}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--bg2);border-bottom:1px solid var(--line2);font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.callout{border:1px solid var(--info-line);background:var(--info-bg);border-radius:14px;padding:12px 16px;margin:18px 0}
+.callout.warn{border-color:var(--warn-line);background:var(--warn-bg)}
+.callout b:first-child{display:block;margin-bottom:2px}
+.member{border:1px solid var(--line);background:var(--bg2);border-radius:16px;margin:18px 0;overflow:hidden;box-shadow:var(--shadow)}
+.member>.sig{background:var(--code-bg);padding:12px 16px;font-family:ui-monospace,Menlo,monospace;font-size:14px;border-bottom:1px solid var(--line);overflow:auto;white-space:pre}
+.member>.body{padding:6px 18px 14px}
+.member .tag{float:right;font-family:-apple-system,"Segoe UI",sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:8px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:22px 0}
+.card{display:block;border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--bg2);transition:.15s;color:var(--fg)}
+.card:hover{border-color:#3d4048;background:var(--bg3);text-decoration:none}
+.card b{display:block;margin-bottom:4px}.card span{color:var(--muted);font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:56px}
+.pager a{flex:1;border:1px solid var(--line);border-radius:14px;padding:12px 16px;color:var(--fg)}
+.pager a:hover{border-color:#3d4048;text-decoration:none}
+.pager small{display:block;color:var(--muted)}.pager .next{text-align:right}
+footer{margin-top:50px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+mark{background:var(--accent-bg);color:#fff}
+/* hero */
+.hero{text-align:center;padding:30px 0 14px}
+.pill{display:inline-block;border:1px solid var(--line2);border-radius:999px;padding:6px 16px;font-size:13px;color:var(--muted);background:rgba(255,255,255,.015)}
+.pill b{color:#fff;font-weight:600}
+.hero h1{font-family:Inter,sans-serif;font-weight:800;font-size:clamp(28px,5vw,54px);letter-spacing:.1em;text-transform:uppercase;margin:34px 0 18px;line-height:1.1;background:linear-gradient(180deg,#fff 20%,#8d9099 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:560px;margin:0 auto 28px;color:var(--muted);font-size:16px}
+.btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;min-width:150px;padding:12px 24px;border-radius:6px;font-weight:600;font-size:14px;border:1px solid var(--line2);background:#0a0a0b;color:#fff;transition:.15s}
+.btn:hover{border-color:#52555f;text-decoration:none}
+.btn.primary{background:#fafafa;color:#111;border-color:#fafafa}
+.btn.primary:hover{background:#fff;box-shadow:0 0 24px rgba(255,255,255,.18)}
+
+@media(max-width:1100px){aside#toc{display:none}main{margin-right:0}}
+@media(max-width:800px){
+  #menu{display:inline-block}
+  nav#side{transform:translateX(-110%);transition:.2s;z-index:25;width:280px}
+  nav#side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.6)}
+  main{margin-left:0;padding:84px 18px 60px}
+  h1{font-size:26px}.logo{font-size:11px;letter-spacing:.16em}
+  .ver{display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="icon" id="menu" aria-label="Menu">☰</button>
+  <a class="logo" href="#/intro"><img src="https://i.imgur.com/n8EDlbw.png" alt="" width="28" height="28" onerror="this.style.display='none'">Velocity public-API <span class="ver">v31.03</span></a>
+  <span class="spacer"></span>
+  <input id="search" type="search" placeholder="Search docs…" aria-label="Search docs">
+</header>
+
+<nav id="side"></nav>
+<aside id="toc"><h5>On this page</h5><div id="tocLinks"></div></aside>
+
+<main><article id="content">
+
+<!-- ============ INTRO ============ -->
+<section class="page" id="p-intro" data-title="Introduction" data-group="Overview">
+  <div class="hero">
+    <span class="pill">Documentation <b>v31.03</b></span>
+    <h1>Velocity public-API</h1>
+    <p>A .NET 10 class library for attaching to Velocity-enabled processes, sending Lua scripts to them over a named pipe, and validating a Velocity license key.</p>
+    <div class="btns"><a class="btn" href="#/setup">Requirements &amp; setup</a><a class="btn primary" href="#/quickstart">Get started →</a></div>
+  </div>
+
+  <div class="callout warn">
+    <b>Administrator rights required</b>
+    The injector that <code>Attach</code> launches needs elevation. Your application must run as administrator or attaching will fail. See <a href="#/setup">Requirements &amp; setup</a> for the manifest steps.
+  </div>
+
+  <h2 id="at-a-glance">At a glance</h2>
+  <table>
+    <tr><th>Item</th><th>Value</th></tr>
+    <tr><td>Assembly</td><td><code>VelocityAPI</code> (version 1.0)</td></tr>
+    <tr><td>Target framework</td><td><code>net10.0</code>. Older .NET versions will not load it unless you retarget and rebuild.</td></tr>
+    <tr><td>Platform</td><td>Windows only (<code>bcrypt.dll</code>, registry, SMBIOS firmware tables, Windows named pipes)</td></tr>
+    <tr><td>NuGet dependency</td><td><code>BouncyCastle</code> 1.8.9 (provides <code>BouncyCastle.Crypto.dll</code>, used for X25519)</td></tr>
+    <tr><td>Namespaces</td><td><code>VelocityAPI</code> (<code>VelAPI</code>, <code>VelocityStates</code>), <code>Velocity</code> (<code>VelocityLicense</code>)</td></tr>
+    <tr><td>License key location</td><td><code>HKEY_CURRENT_USER\SOFTWARE\Velocity\LicenseKey</code> (<code>REG_SZ</code>)</td></tr>
+  </table>
+
+  <div class="callout">
+    <b>Source-backed</b>
+    These docs were written from the VelocityAPI source code (<code>net10.0</code> project) and checked against the compiled DLL.
+  </div>
+
+  <h2 id="where-next">Where to go next</h2>
+  <div class="cards">
+    <a class="card" href="#/setup"><b>Requirements &amp; setup</b><span>Dependencies and adding the API in Visual Studio.</span></a>
+    <a class="card" href="#/quickstart"><b>Quickstart</b><span>Attach and run your first script.</span></a>
+    <a class="card" href="#/velapi"><b>VelAPI</b><span>The main class: attach, execute, status.</span></a>
+    <a class="card" href="#/license"><b>Licensing</b><span>Keys, registry path and status checks.</span></a>
+  </div>
+</section>
+
+<!-- ============ SETUP ============ -->
+<section class="page" id="p-setup" data-title="Requirements &amp; setup" data-group="Overview">
+  <h1>Requirements &amp; setup</h1>
+  <p class="lead">Everything you need installed, and how to add VelocityAPI to a project using the Visual Studio UI.</p>
+
+  <h2 id="deps">Required dependencies</h2>
+  <table>
+    <tr><th>Dependency</th><th>Details</th></tr>
+    <tr><td><b>Windows 10 / 11 (x64)</b></td><td>The library calls Windows-only APIs and will not run on Linux or macOS.</td></tr>
+    <tr><td><b>.NET 10 SDK</b> (runtime for end users)</td><td>The project targets <code>net10.0</code>. For a WPF or WinForms app, target <code>net10.0-windows</code>.</td></tr>
+    <tr><td><b>Visual Studio</b></td><td>A version that supports .NET 10 and the <code>.slnx</code> solution format (the source was authored in Visual Studio 2026). Install the <i>.NET desktop development</i> workload.</td></tr>
+    <tr><td><b>BouncyCastle</b> NuGet package</td><td>Version <code>1.8.9</code>, as referenced by <code>VelocityAPI.csproj</code>. Ships <code>BouncyCastle.Crypto.dll</code>, which must sit next to your app.</td></tr>
+    <tr><td><b>Administrator rights</b></td><td>The injector requires elevation. Restart Visual Studio as administrator to debug.</td></tr>
+    <tr><td><b>Internet access</b></td><td><code>realvelocity.xyz</code> (auto-update on <code>StartCommunication</code>) and <code>getvelocity.llc</code> (license auth).</td></tr>
+  </table>
+  <p>The following ship with .NET and need no extra install: <code>System.Net.Http</code>, <code>System.Text.Json</code>, <code>System.IO.Pipes</code>, <code>System.Security.Cryptography</code>, <code>Microsoft.Win32.Registry</code>.</p>
+
+  <div class="callout">
+    <b>No prebuilt DLL on the repo</b>
+    The source repository does not distribute compiled DLLs. Build <code>VelocityAPI</code> yourself, or use a DLL you already have.
+  </div>
+
+  <h2 id="build">1. Build the DLL</h2>
+  <ol>
+    <li>Open <code>VelocityAPI.slnx</code> in Visual Studio.</li>
+    <li>In the toolbar set the configuration to <b>Release</b>.</li>
+    <li>Choose <b>Build → Build Solution</b> (<code>Ctrl+Shift+B</code>).</li>
+    <li>Your output is in <code>VelocityAPI\bin\Release\net10.0\</code>: <code>VelocityAPI.dll</code> and <code>BouncyCastle.Crypto.dll</code>.</li>
+  </ol>
+
+  <h2 id="vs-ref">2. Add it to your project (Visual Studio UI)</h2>
+  <h3>Option A: reference the DLL</h3>
+  <ol>
+    <li>In <b>Solution Explorer</b>, right-click your project's <b>Dependencies</b> node and choose <b>Add Project Reference…</b></li>
+    <li>Open the <b>Browse</b> tab and click <b>Browse…</b> at the bottom.</li>
+    <li>Select <code>VelocityAPI.dll</code> and click <b>Add</b>, then <b>OK</b>.</li>
+    <li>Expand <b>Dependencies → Assemblies</b>, select <i>VelocityAPI</i>, and in the <b>Properties</b> window set <b>Copy Local</b> to <b>Yes</b>.</li>
+  </ol>
+  <h3>Option B: reference the project</h3>
+  <ol>
+    <li>Right-click the <b>solution</b> → <b>Add → Existing Project…</b> and pick <code>VelocityAPI\VelocityAPI.csproj</code>.</li>
+    <li>Right-click your project's <b>Dependencies</b> → <b>Add Project Reference…</b> → <b>Projects</b> → tick <b>VelocityAPI</b> → <b>OK</b>.</li>
+  </ol>
+  <p>Option B also brings in BouncyCastle automatically. With Option A you must add it yourself:</p>
+  <ol>
+    <li>Right-click your project → <b>Manage NuGet Packages…</b></li>
+    <li>On the <b>Browse</b> tab search for <code>BouncyCastle</code>, pick version <b>1.8.9</b>, click <b>Install</b>.</li>
+  </ol>
+  <p>The same result as a project file entry:</p>
+<pre><code data-lang="xml">&lt;ItemGroup&gt;
+  &lt;Reference Include="VelocityAPI"&gt;
+    &lt;HintPath&gt;libs\VelocityAPI.dll&lt;/HintPath&gt;
+    &lt;Private&gt;True&lt;/Private&gt;
+  &lt;/Reference&gt;
+  &lt;PackageReference Include="BouncyCastle" Version="1.8.9" /&gt;
+&lt;/ItemGroup&gt;</code></pre>
+
+  <div class="callout">
+    <b>Reference it, don't embed it</b>
+    Do not set the DLL's <i>Build Action</i> to <i>Embedded Resource</i>. .NET resolves referenced assemblies from the output folder, so the DLL (and <code>BouncyCastle.Crypto.dll</code>) must be copied next to your <code>.exe</code>. Use <b>Copy Local = Yes</b>, or <b>Copy to Output Directory = Copy always</b> if you added the file as an item.
+  </div>
+
+  <h2 id="manifest">3. Require administrator</h2>
+  <ol>
+    <li>Right-click your project → <b>Add → New Item…</b></li>
+    <li>Choose <b>Application Manifest File (Windows)</b> and keep the name <code>app.manifest</code>.</li>
+    <li>In the file, set the execution level:</li>
+  </ol>
+<pre><code data-lang="xml">&lt;requestedExecutionLevel level="requireAdministrator" uiAccess="false" /&gt;</code></pre>
+  <p>Windows now shows a UAC prompt every time the app starts. After this change, restart Visual Studio as administrator to build and debug. Confirm the manifest is picked up under <b>Project → Properties → Application → Win32 resources → Manifest</b>.</p>
+
+  <h2 id="events">4. Hook up start and stop (WPF)</h2>
+  <ol>
+    <li>Open your window in the designer and click it. In the <b>Properties</b> window switch to <b>Events</b> (the ⚡ icon).</li>
+    <li>Double-click the <b>Loaded</b> field and again on <b>Closing</b>. Visual Studio creates both handlers.</li>
+    <li>Fill them in as shown in the <a href="#/quickstart">Quickstart</a>.</li>
+  </ol>
+
+  <h2 id="layout">5. Files created at runtime</h2>
+  <p>Everything is relative to the app's <b>current working directory</b> (normally the folder containing your <code>.exe</code>):</p>
+<pre><code>YourApp.exe
+VelocityAPI.dll
+BouncyCastle.Crypto.dll
+Bin\                     created by StartCommunication
+  Decompiler.exe         downloaded by auto-update, started by StartCommunication
+  erto3e4rortoergn.exe   downloaded injector, launched by Attach
+  current_version.txt    last installed version
+AutoExec\                created
+Scripts\                 created
+Workspace\               created; its path is sent to attached clients</code></pre>
+</section>
+
+<!-- ============ QUICKSTART ============ -->
+<section class="page" id="p-quickstart" data-title="Quickstart" data-group="Overview">
+  <h1>Quickstart</h1>
+  <p class="lead">A complete WPF example: start the service, attach to a process, execute a script, clean up.</p>
+  <p>Complete the <a href="#/setup">setup</a> first (reference, BouncyCastle, administrator manifest).</p>
+
+  <h2 id="class">1. Create the instance</h2>
+  <p>Keep one <code>VelAPI</code> per app, at class level.</p>
+<pre><code data-lang="cs">using VelocityAPI;
+
+public partial class MainWindow : Window
+{
+    private readonly VelAPI velocityApi = new VelAPI();</code></pre>
+
+  <h2 id="start-stop">2. Start and stop</h2>
+<pre><code data-lang="cs">    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Blocking network + file work (auto-update), so keep it off the UI thread.
+        await Task.Run(() =&gt; velocityApi.StartCommunication());
+    }
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        velocityApi.StopCommunication();
+    }</code></pre>
+
+  <h2 id="attach">3. Attach to a process</h2>
+<pre><code data-lang="cs">    private async Task&lt;bool&gt; AttachAsync(int pid)
+    {
+        VelocityStates state = await velocityApi.Attach(pid, 15000);
+        return state == VelocityStates.Attached;
+    }</code></pre>
+
+  <h2 id="execute">4. Execute a script</h2>
+<pre><code data-lang="cs">    private void RunScript(string lua, int pid)
+    {
+        VelocityStates result = velocityApi.Execute(lua, new[] { pid });
+
+        if (result == VelocityStates.NotAttached)
+            MessageBox.Show("Attach first.");
+    }
+}</code></pre>
+
+  <h2 id="checking-results">5. Check the result</h2>
+  <table>
+    <tr><th>Call</th><th>You can get</th></tr>
+    <tr><td><code>Attach</code></td><td><code>Attached</code> or <code>Error</code> (timeout)</td></tr>
+    <tr><td><code>Execute</code></td><td><code>Executed</code> or <code>NotAttached</code></td></tr>
+  </table>
+  <p>See <a href="#/states">VelocityStates</a> for details.</p>
+
+  <div class="callout warn">
+    <b>Offline start</b>
+    <code>StartCommunication</code> contacts the update server first. If it cannot be reached the call throws, so wrap it in <code>try/catch</code> in production code.
+  </div>
+</section>
+
+<!-- ============ VELAPI ============ -->
+<section class="page" id="p-velapi" data-title="VelAPI" data-group="API Reference">
+  <h1>VelAPI</h1>
+  <p class="lead"><code>public class VelocityAPI.VelAPI</code>. The main entry point: tracks attached processes and sends Lua scripts to them.</p>
+
+  <h2 id="velapi-ctor">Constructor</h2>
+  <div class="member" id="m-ctor"><div class="sig"><span class="k">public</span> <span class="t">VelAPI</span>()</div>
+    <div class="body"><p>Creates an instance. Nothing starts until you call <a href="#m-start"><code>StartCommunication()</code></a>.</p></div></div>
+
+  <h2 id="velapi-fields">Public fields</h2>
+  <div class="member" id="m-status"><div class="sig"><span class="k">public</span> <span class="t">VelocityStates</span> VelocityStatus = VelocityStates.NotAttached</div>
+    <div class="body"><p>The last state set by <code>Attach</code>: <code>Attaching</code> while waiting, then <code>Attached</code> or <code>Error</code>.</p></div></div>
+  <div class="member" id="m-pids"><div class="sig"><span class="k">public</span> <span class="t">List</span>&lt;<span class="k">int</span>&gt; injected_pids</div>
+    <div class="body"><p>Process IDs currently tracked as attached. The library mutates it under an internal lock that is not exposed, so avoid iterating it from your own threads. Use <code>IsAttached</code> and <code>AttachedCount</code> instead.</p></div></div>
+
+  <h2 id="velapi-props">Properties</h2>
+  <div class="member" id="m-count"><div class="sig"><span class="k">public</span> <span class="k">int</span> AttachedCount { <span class="k">get</span>; }</div>
+    <div class="body"><p>Number of clients whose Lua pipe currently exists. Dead entries are pruned first.</p></div></div>
+
+  <h2 id="velapi-methods">Methods</h2>
+
+  <div class="member" id="m-start"><div class="sig"><span class="k">public</span> <span class="k">void</span> StartCommunication()</div>
+    <div class="body">
+      <p>Prepares the working folder, updates the helper binaries and starts the background service.</p>
+      <ol>
+        <li>Creates <code>Bin</code>, <code>AutoExec</code>, <code>Workspace</code> and <code>Scripts</code> if missing.</li>
+        <li><b>Auto-update.</b> Reads <code>download_links.json</code> and <code>current_version.txt</code> from <code>realvelocity.xyz</code>. If the version differs from <code>Bin\current_version.txt</code>, it deletes and re-downloads <code>Bin\erto3e4rortoergn.exe</code> (the injector) and <code>Bin\Decompiler.exe</code>.</li>
+        <li>Calls <code>StopCommunication()</code>, then starts <code>Bin\Decompiler.exe</code> hidden, with redirected input, output and error.</li>
+        <li>Starts a 100 ms timer that prunes detached clients and sends every attached client <code>setworkspacefolder: &lt;cwd&gt;\Workspace</code> (Base64).</li>
+      </ol>
+      <p>This call is synchronous and blocks on network I/O. It throws if the update server is unreachable.</p>
+    </div></div>
+
+  <div class="member" id="m-stop"><div class="sig"><span class="k">public</span> <span class="k">void</span> StopCommunication()</div>
+    <div class="body"><p>Stops the timer, kills and disposes the <code>Decompiler.exe</code> process and clears <code>injected_pids</code>. Call it when your app closes. Safe to call repeatedly.</p></div></div>
+
+  <div class="member" id="m-attach"><div class="sig"><span class="k">public</span> <span class="t">Task</span>&lt;<span class="t">VelocityStates</span>&gt; Attach(<span class="k">int</span> pid, <span class="k">int</span> timeoutMs = <span class="n">15000</span>)</div>
+    <div class="body">
+      <p>Attaches to the process with ID <code>pid</code>.</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>pid</code></td><td><code>int</code></td><td>Target process ID.</td></tr>
+        <tr><td><code>timeoutMs</code></td><td><code>int</code></td><td>Optional. How long to wait for the client's pipe to appear. Default <code>15000</code>.</td></tr>
+      </table>
+      <p><b>Behaviour</b></p>
+      <ul>
+        <li>If the pipe for <code>pid</code> already exists, returns <code>Attached</code> immediately.</li>
+        <li>Otherwise sets <code>VelocityStatus = Attaching</code> and launches <code>Bin\erto3e4rortoergn.exe &lt;pid&gt;</code> (a visible console window; it does not wait for it to exit).</li>
+        <li>Polls every 100 ms for the pipe. When it appears, the PID is tracked and <code>Attached</code> is returned.</li>
+        <li>If the timeout passes, returns <code>Error</code>.</li>
+      </ul>
+      <p><b>Returns</b> <code>Attached</code> or <code>Error</code>. <code>Bin\erto3e4rortoergn.exe</code> must exist, so call <code>StartCommunication</code> first.</p>
+    </div></div>
+
+  <div class="member" id="m-isattached"><div class="sig"><span class="k">public</span> <span class="k">bool</span> IsAttached(<span class="k">int</span> pid)</div>
+    <div class="body"><p>Checks whether the Lua pipe for <code>pid</code> exists. If it does, the PID is added to the tracked list (if not already there) and <code>true</code> is returned. If not, the PID is removed and <code>false</code> is returned. Detection is purely pipe-based, so it also finds clients attached by other means.</p></div></div>
+
+  <div class="member" id="m-execute"><div class="sig"><span class="k">public</span> <span class="t">VelocityStates</span> Execute(<span class="k">string</span> script, <span class="t">IEnumerable</span>&lt;<span class="k">int</span>&gt; targetPids)</div>
+    <div class="body">
+      <p>Sends a Lua script to every listed PID that is attached.</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>script</code></td><td><code>string</code></td><td>Lua source. It is Base64-encoded (UTF-8) before sending.</td></tr>
+        <tr><td><code>targetPids</code></td><td><code>IEnumerable&lt;int&gt;</code></td><td>Processes to run in. PIDs failing <code>IsAttached</code> are skipped.</td></tr>
+      </table>
+      <p><b>Returns</b> <code>NotAttached</code> if no PID is attached, otherwise <code>Executed</code>.</p>
+      <div class="callout"><b>"Executed" means "sent"</b>The script is written to each pipe on a background thread (fire and forget). Script errors and output are not returned.</div>
+    </div></div>
+
+  <div class="member" id="m-savekey"><div class="sig"><span class="k">public static</span> <span class="k">bool</span> SaveLicenseKeyToRegistry(<span class="k">string</span> key)</div>
+    <div class="body">
+      <p>Creates <code>HKEY_CURRENT_USER\SOFTWARE\Velocity</code> if needed and writes the trimmed key as two <code>REG_SZ</code> values: <code>LicenseKey</code> and <code>RBX_EXT_LicenseKey</code>.</p>
+      <p><b>Returns</b> <code>false</code> for null, empty or whitespace keys or on any registry error, otherwise <code>true</code>. See <a href="#/license">Licensing</a> for how to read it back.</p>
+    </div></div>
+
+  <div class="member" id="m-b64e"><div class="sig"><span class="k">public static</span> <span class="k">string</span> Base64Encode(<span class="k">string</span> plainText)</div>
+    <div class="body"><p>UTF-8 bytes of <code>plainText</code>, Base64-encoded.</p></div></div>
+
+  <div class="member" id="m-b64d"><div class="sig"><span class="k">public static</span> <span class="k">byte</span>[] Base64Decode(<span class="k">string</span> plainText)</div>
+    <div class="body"><p>Decodes a Base64 string to bytes. Throws <code>FormatException</code> on invalid input. The parameter is Base64 text despite its name.</p></div></div>
+</section>
+
+<!-- ============ STATES ============ -->
+<section class="page" id="p-states" data-title="VelocityStates" data-group="API Reference">
+  <h1>VelocityStates</h1>
+  <p class="lead"><code>public enum VelocityAPI.VelocityStates</code>. The result of attach and execute operations.</p>
+<pre><code data-lang="cs">public enum VelocityStates
+{
+    Attaching,      // 0
+    Attached,       // 1
+    NotAttached,    // 2
+    NoProcessFound, // 3
+    TamperDetected, // 4
+    Error,          // 5
+    Executed        // 6
+}</code></pre>
+  <table>
+    <tr><th>Value</th><th>Used by</th><th>Meaning</th></tr>
+    <tr><td><code>Attaching</code></td><td><code>VelocityStatus</code></td><td>An attach is waiting for the pipe.</td></tr>
+    <tr><td><code>Attached</code></td><td><code>Attach</code></td><td>The client's pipe exists; ready for scripts.</td></tr>
+    <tr><td><code>NotAttached</code></td><td><code>Execute</code>, default <code>VelocityStatus</code></td><td>No listed PID is attached.</td></tr>
+    <tr><td><code>NoProcessFound</code></td><td>not used</td><td>Defined but never returned by <code>VelAPI</code> in this version.</td></tr>
+    <tr><td><code>TamperDetected</code></td><td>not used</td><td>Defined but never returned by <code>VelAPI</code> in this version.</td></tr>
+    <tr><td><code>Error</code></td><td><code>Attach</code></td><td>The pipe did not appear within <code>timeoutMs</code>.</td></tr>
+    <tr><td><code>Executed</code></td><td><code>Execute</code></td><td>The script was sent to at least one attached process.</td></tr>
+  </table>
+  <p>Handle <code>NoProcessFound</code> and <code>TamperDetected</code> defensively in a <code>default</code> branch; future versions may return them.</p>
+</section>
+
+<!-- ============ LICENSE ============ -->
+<section class="page" id="p-license" data-title="Licensing" data-group="API Reference">
+  <h1>Licensing</h1>
+  <p class="lead">The <code>Velocity</code> namespace contains <code>VelocityLicense</code>, which validates a license key against the Velocity server.</p>
+
+  <h2 id="reg-key">Where the key is stored</h2>
+  <p>The license key lives in the registry of the current Windows user:</p>
+<pre><code>Computer\HKEY_CURRENT_USER\SOFTWARE\Velocity\LicenseKey   [REG_SZ]</code></pre>
+  <p><code>VelAPI.SaveLicenseKeyToRegistry</code> also writes the same value to <code>RBX_EXT_LicenseKey</code>. Read it like this:</p>
+<pre><code data-lang="cs">using Microsoft.Win32;
+
+static string? ReadLicenseKey()
+{
+    using RegistryKey? rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Velocity");
+    return rk?.GetValue("LicenseKey") as string;   // null if not set
+}</code></pre>
+  <p>To check it by hand, open <code>regedit</code> and go to the path above. The value type is <b>String</b>.</p>
+
+  <h2 id="key-formats">Accepted key formats</h2>
+  <p><code>AuthenticateAsync</code> rejects anything else locally with <code>"bad key format"</code>.</p>
+  <table>
+    <tr><th>Kind</th><th>Format</th></tr>
+    <tr><td>Paid personal</td><td><code>V****-****-****-****</code>: 20 characters, uppercase hex, e.g. <code>VABCD-1234-EF56-7890</code></td></tr>
+    <tr><td>Work.ink free key</td><td>64 lowercase hex characters</td></tr>
+    <tr><td>Admin shared key</td><td>3 to 32 characters from <code>A-Z a-z 0-9 _ -</code></td></tr>
+  </table>
+
+  <h2 id="lic-class">VelocityLicense</h2>
+  <p><code>public sealed class Velocity.VelocityLicense : IDisposable</code></p>
+
+  <div class="member"><div class="sig"><span class="k">public</span> <span class="t">VelocityLicense</span>()</div>
+    <div class="body"><p>Creates the client for <code>https://getvelocity.llc</code> (browser-style <code>User-Agent</code>, JSON accept header).</p></div></div>
+
+  <div class="member" id="m-isauth"><div class="sig"><span class="k">public</span> <span class="k">bool</span> IsAuthenticated { <span class="k">get</span>; }</div>
+    <div class="body"><p><code>true</code> after a successful <code>AuthenticateAsync</code>.</p></div></div>
+
+  <div class="member" id="m-auth"><div class="sig"><span class="k">public</span> <span class="t">Task</span>&lt;<span class="t">AuthResult</span>&gt; AuthenticateAsync(<span class="k">string</span> key)</div>
+    <div class="body">
+      <p>Authenticates <code>key</code> and opens an encrypted session.</p>
+      <ol>
+        <li>Validates the key format.</li>
+        <li>Computes the hardware ID (<a href="#/internals">details</a>). Fails with <code>"hwid failed"</code> if empty.</li>
+        <li>Generates an ephemeral X25519 key pair, derives a transit key from the server's public key (HKDF), and sends the encrypted request to <code>POST /api/v1/license/auth</code> with the key, hardware IDs and product <code>"roblox"</code>.</li>
+        <li>On a <code>TIMESTAMP_SKEW</code> reply, adjusts for the server clock and retries once.</li>
+      </ol>
+      <p><b>Returns</b> <code>AuthResult</code>. On failure <code>Error</code> holds the reason, e.g. <code>bad key format</code>, <code>hwid failed</code>, <code>server: …</code>, <code>no valid response after retry</code>, <code>response decrypt failed</code>.</p>
+    </div></div>
+
+  <div class="member" id="m-query"><div class="sig"><span class="k">public</span> <span class="t">Task</span>&lt;<span class="t">LicenseStatus</span>?&gt; QueryStatusAsync()</div>
+    <div class="body">
+      <p>Asks the server how long the authenticated key has left (<code>POST /api/v1/license/status</code>, encrypted with the session key).</p>
+      <p><b>Returns</b> <code>null</code> if you have not authenticated, or on a network, server (5xx) or decrypt failure. On an HTTP 4xx the result has only <code>Code</code> set. Otherwise a fully populated <code>LicenseStatus</code>.</p>
+    </div></div>
+
+  <div class="member"><div class="sig"><span class="k">public</span> <span class="k">void</span> Dispose()</div>
+    <div class="body"><p>Clears the authenticated state, zeroes the session key and disposes the <code>HttpClient</code>. Use <code>using var</code>.</p></div></div>
+
+  <h2 id="lic-auth">VelocityLicense.AuthResult</h2>
+  <p><code>public sealed record AuthResult(bool Ok, string Error = "", string Product = "", string ExpiresAt = "")</code></p>
+  <table>
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>Ok</code></td><td><code>bool</code></td><td>Whether authentication succeeded.</td></tr>
+    <tr><td><code>Error</code></td><td><code>string</code></td><td>Failure reason; empty on success.</td></tr>
+    <tr><td><code>Product</code></td><td><code>string</code></td><td>Product the key belongs to.</td></tr>
+    <tr><td><code>ExpiresAt</code></td><td><code>string</code></td><td>Expiry timestamp from the server.</td></tr>
+  </table>
+
+  <h2 id="lic-status">VelocityLicense.LicenseStatus</h2>
+  <p><code>public sealed record LicenseStatus</code>. All properties are <code>init</code>.</p>
+  <table>
+    <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>Valid</code></td><td><code>bool</code></td><td>Key is currently valid.</td></tr>
+    <tr><td><code>Expired</code></td><td><code>bool</code></td><td>Key has expired.</td></tr>
+    <tr><td><code>SecondsRemaining</code></td><td><code>long</code></td><td>Seconds left. <b><code>-1</code> means lifetime</b> (also the default).</td></tr>
+    <tr><td><code>Source</code></td><td><code>string</code></td><td>Where the key came from.</td></tr>
+    <tr><td><code>Product</code></td><td><code>string</code></td><td>Licensed product.</td></tr>
+    <tr><td><code>Duration</code></td><td><code>string</code></td><td><code>"day"</code>, <code>"week"</code>, <code>"monthly"</code> or <code>"lifetime"</code>.</td></tr>
+    <tr><td><code>ExpiresAt</code></td><td><code>string</code></td><td>ISO-8601 timestamp; empty for lifetime keys.</td></tr>
+    <tr><td><code>Code</code></td><td><code>string</code></td><td>Set on failure (e.g. <code>http-4xx</code> or the server's code).</td></tr>
+  </table>
+
+  <h2 id="lic-example">Example</h2>
+<pre><code data-lang="cs">using Velocity;
+using VelocityAPI;
+
+string? key = ReadLicenseKey();                       // from HKCU\SOFTWARE\Velocity\LicenseKey
+if (key is null) { Console.WriteLine("No key saved."); return; }
+
+using var license = new VelocityLicense();
+
+VelocityLicense.AuthResult auth = await license.AuthenticateAsync(key);
+if (!auth.Ok) { Console.WriteLine($"Auth failed: {auth.Error}"); return; }
+
+VelocityLicense.LicenseStatus? status = await license.QueryStatusAsync();
+if (status is null) { Console.WriteLine("Status query failed."); return; }
+
+if (status.SecondsRemaining &lt; 0)
+    Console.WriteLine("Lifetime key");
+else
+    Console.WriteLine($"Expires in {status.SecondsRemaining}s ({status.Duration})");
+
+VelAPI.SaveLicenseKeyToRegistry(key);                 // persist for next launch</code></pre>
+</section>
+
+<!-- ============ HELPERS ============ -->
+<section class="page" id="p-helpers" data-title="Helper types" data-group="API Reference">
+  <h1>Helper types</h1>
+  <p class="lead">Smaller public types in the assembly.</p>
+
+  <h2 id="aes">AESEncryption</h2>
+  <p><code>public class AESEncryption</code> (global namespace). Password-based AES-GCM through Windows CNG (<code>bcrypt.dll</code>). The key is derived from the password with PBKDF2-SHA256 and a random salt.</p>
+  <div class="member"><div class="sig"><span class="k">public static</span> <span class="k">string</span> Encrypt(<span class="k">string</span> plaintext, <span class="k">string</span> password)</div>
+    <div class="body"><p>Returns Base64 of <code>salt (16) ‖ nonce (12) ‖ ciphertext ‖ tag</code>. Throws <code>ArgumentException</code> if <code>plaintext</code> or <code>password</code> is empty. The output differs on every call because salt and nonce are random.</p></div></div>
+  <div class="member"><div class="sig"><span class="k">public static</span> <span class="k">string</span> Decrypt(<span class="k">string</span> ciphertext, <span class="k">string</span> password)</div>
+    <div class="body"><p>Reverses <code>Encrypt</code>. Throws <code>ArgumentException</code> for empty input, an error for data that is too short, and a cryptographic error with "Wrong password or corrupted data" on a bad password or tampered data.</p></div></div>
+<pre><code data-lang="cs">string sealedText = AESEncryption.Encrypt("secret", "hunter2");
+string plain      = AESEncryption.Decrypt(sealedText, "hunter2");</code></pre>
+  <p>The library itself uses this to decrypt the download links during auto-update.</p>
+
+  <h2 id="dud">DownloadUrlData</h2>
+  <p><code>public class VelocityAPI.DownloadUrlData</code>. A data holder for <code>download_links.json</code>.</p>
+  <table>
+    <tr><th>Property</th><th>Type</th><th>Meaning</th></tr>
+    <tr><td><code>L1</code></td><td><code>string?</code></td><td>Encrypted URL of <code>Decompiler.exe</code>.</td></tr>
+    <tr><td><code>L2</code></td><td><code>string?</code></td><td>Encrypted URL of the injector.</td></tr>
+    <tr><td><code>question</code></td><td><code>string?</code></td><td>Password used with <code>AESEncryption.Decrypt</code>.</td></tr>
+  </table>
+</section>
+
+<!-- ============ INTERNALS ============ -->
+<section class="page" id="p-internals" data-title="Internals &amp; data use" data-group="Notes">
+  <h1>Internals &amp; data use</h1>
+  <p class="lead">What the library does behind the public API. Read this before shipping an app that uses it.</p>
+
+  <h2 id="pipes">Named pipes</h2>
+  <p>Each attached client exposes a pipe named <code>uoQcySKXSUxxJNpVQyatpHQwYoGfhcbh_&lt;pid&gt;</code>, reachable as <code>\\.\pipe\uoQcySKXSUxxJNpVQyatpHQwYoGfhcbh_&lt;pid&gt;</code>. Existence is tested with <code>WaitNamedPipe</code>; this is the only attach detection. Scripts are written to the pipe as Base64 text from a short-lived background thread. Errors are swallowed.</p>
+
+  <h2 id="network">Network access</h2>
+  <table>
+    <tr><th>Host</th><th>When</th><th>What</th></tr>
+    <tr><td><code>realvelocity.xyz</code></td><td><code>StartCommunication</code></td><td><code>assets/current_version.txt</code> and <code>assets/download_links.json</code>, then the two executables if the version changed.</td></tr>
+    <tr><td><code>getvelocity.llc</code></td><td><code>AuthenticateAsync</code>, <code>QueryStatusAsync</code></td><td>Encrypted license requests.</td></tr>
+  </table>
+
+  <h2 id="hwid">Hardware ID</h2>
+  <div class="callout warn">
+    <b>Data sent to the license server</b>
+    The hardware ID is a 32-byte HKDF hash (hex) of the Windows <code>MachineGuid</code>, the CPU vendor string and feature flags, the system volume serial, and the SMBIOS system UUID. A legacy ID, identical but using the network adapter MAC address instead of the SMBIOS UUID, is also sent when it differs. Mention this in your privacy notice if you distribute software that calls <code>AuthenticateAsync</code>.
+  </div>
+
+  <h2 id="registry">Registry</h2>
+  <table>
+    <tr><th>Key</th><th>Value</th><th>Type</th><th>Access</th></tr>
+    <tr><td><code>HKCU\SOFTWARE\Velocity</code></td><td><code>LicenseKey</code></td><td>REG_SZ</td><td>written by <code>SaveLicenseKeyToRegistry</code></td></tr>
+    <tr><td><code>HKCU\SOFTWARE\Velocity</code></td><td><code>RBX_EXT_LicenseKey</code></td><td>REG_SZ</td><td>written by <code>SaveLicenseKeyToRegistry</code></td></tr>
+    <tr><td><code>HKLM\SOFTWARE\Microsoft\Cryptography</code></td><td><code>MachineGuid</code></td><td>REG_SZ</td><td>read for the hardware ID</td></tr>
+  </table>
+
+  <h2 id="auto-update">Auto-update</h2>
+  <div class="callout warn">
+    <b>Downloads and runs executables</b>
+    <code>StartCommunication</code> may replace <code>Bin\Decompiler.exe</code> and <code>Bin\erto3e4rortoergn.exe</code> with files fetched from the update host, then launches them (the injector one on <code>Attach</code>, with administrator rights). Only use it where that is acceptable, and keep your app's working directory writable only by trusted users.
+  </div>
+
+  <h2 id="wire">License wire format</h2>
+  <p>Requests are JSON envelopes <code>{"v":1, ...}</code> carrying an AES-256-GCM payload (<code>iv(12) ‖ tag(16) ‖ ciphertext</code>, hex-encoded). The additional authenticated data binds the timestamp and nonce, and replies use a <code>|resp</code> suffix. A server-reported clock skew is corrected once per call.</p>
+</section>
+
+<footer>Velocity public-API v31.03 documentation · written from the VelocityAPI source</footer>
+</article></main>
+
+<script>
+(function(){
+  const pages=[...document.querySelectorAll('.page')];
+  const side=document.getElementById('side')||document.getElementById('side');
+  const nav=document.getElementById('side');
+  const content=document.getElementById('content');
+  const key=p=>p.id.slice(2);
+
+  /* sidebar */
+  let html='',group='';
+  pages.forEach(p=>{
+    if(p.dataset.group!==group){group=p.dataset.group;html+=`<h4>${group}</h4>`}
+    html+=`<a href="#/${key(p)}" data-p="${key(p)}">${p.dataset.title}</a>`;
+    if(key(p)==='velapi'){
+      p.querySelectorAll('.member[id]').forEach(m=>{
+        const n=m.querySelector('.sig').textContent.split('(')[0].split('{')[0].split('=')[0].trim().split(/\s+/).pop()||m.id;
+        html+=`<a class="sub" href="#/velapi/${m.id}" data-p="velapi" data-s="${n.toLowerCase()}">${n}</a>`;
+      });
+    }
+  });
+  nav.innerHTML=html;
+
+  /* pager */
+  pages.forEach((p,i)=>{
+    const d=document.createElement('div');d.className='pager';
+    d.innerHTML=(pages[i-1]?`<a href="#/${key(pages[i-1])}"><small>← Previous</small>${pages[i-1].dataset.title}</a>`:'<span></span>')+
+                (pages[i+1]?`<a class="next" href="#/${key(pages[i+1])}"><small>Next →</small>${pages[i+1].dataset.title}</a>`:'<span></span>');
+    p.appendChild(d);
+  });
+
+  /* syntax highlight */
+  const KW=/^(using|var|new|await|async|public|private|static|class|void|int|string|bool|if|else|return|switch|case|break|default|null|true|false|record|get|set|init|const|readonly|sealed|this|try|catch|foreach|in|enum|namespace|partial|object|is)$/;
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  document.querySelectorAll('pre code[data-lang]').forEach(c=>{
+    const src=c.textContent;
+    const re=/(\/\/[^\n]*|<!--[\s\S]*?-->)|(\$?"(?:[^"\\\n]|\\.)*")|(\b\d+\b)|(\b[A-Za-z_][A-Za-z0-9_]*\b)/g;
+    let out='',last=0,m;
+    while((m=re.exec(src))){
+      out+=esc(src.slice(last,m.index)); const t=m[0]; last=m.index+t.length;
+      if(m[1]) out+=`<span class="c">${esc(t)}</span>`;
+      else if(m[2]) out+=`<span class="s">${esc(t)}</span>`;
+      else if(m[3]) out+=`<span class="n">${t}</span>`;
+      else if(c.dataset.lang==='cs'&&KW.test(t)) out+=`<span class="k">${t}</span>`;
+      else if(c.dataset.lang==='cs'&&/^[A-Z]/.test(t)) out+=`<span class="t">${t}</span>`;
+      else out+=t;
+    }
+    c.innerHTML=out+esc(src.slice(last));
+  });
+
+  /* copy buttons */
+  document.querySelectorAll('pre').forEach(pre=>{
+    const b=document.createElement('button');b.className='copy';b.textContent='Copy';
+    b.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(pre.querySelector('code').innerText).then(()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1200)})};
+    pre.appendChild(b);
+  });
+
+  /* router */
+  function route(){
+    const h=location.hash.replace(/^#\/?/,'').split('/');
+    let id=h[0]||'intro'; let el=document.getElementById('p-'+id);
+    if(!el){ // legacy in-page anchor
+      const t=document.getElementById(h[0]);
+      if(t){const pg=t.closest('.page'); if(pg){id=key(pg);el=pg;}}
+    }
+    if(!el){id='intro';el=document.getElementById('p-intro')}
+    pages.forEach(p=>p.classList.toggle('show',p===el));
+    nav.querySelectorAll('a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#/'+id&&!a.classList.contains('sub')));
+    document.title=el.dataset.title.replace(/&amp;/g,'&')+' · Velocity public-API';
+    buildToc(el);
+    nav.classList.remove('open');
+    const sub=h[1]&&document.getElementById(h[1]);
+    if(sub)sub.scrollIntoView(); else window.scrollTo(0,0);
+  }
+  function buildToc(el){
+    const box=document.getElementById('tocLinks');
+    box.innerHTML=[...el.querySelectorAll('h2[id]')].map(h=>`<a href="#/${key(el)}/${h.id}" data-id="${h.id}">${h.textContent}</a>`).join('');
+  }
+  window.addEventListener('hashchange',route);
+
+  /* in-page anchors inside pages: #m-start style links */
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('a[href^="#"]');if(!a)return;
+    const href=a.getAttribute('href');
+    if(href.startsWith('#/'))return;
+    const t=document.getElementById(href.slice(1));
+    if(t){e.preventDefault();const pg=t.closest('.page');
+      if(pg&&!pg.classList.contains('show')){location.hash='#/'+key(pg)+'/'+t.id}
+      else t.scrollIntoView();}
+  });
+
+  /* toc highlight */
+  addEventListener('scroll',()=>{
+    const hs=[...document.querySelectorAll('.page.show h2[id]')];let cur=null;
+    hs.forEach(h=>{if(h.getBoundingClientRect().top<120)cur=h.id});
+    document.querySelectorAll('#tocLinks a').forEach(a=>a.classList.toggle('on',a.dataset.id===cur));
+  },{passive:true});
+
+  /* search */
+  const q=document.getElementById('search');
+  q.addEventListener('input',()=>{
+    const v=q.value.trim().toLowerCase();
+    const links=[...nav.querySelectorAll('a')];
+    if(!v){links.forEach(a=>a.classList.remove('hide'));return}
+    links.forEach(a=>{
+      const pg=document.getElementById('p-'+a.dataset.p);
+      const hit=a.textContent.toLowerCase().includes(v)||(!a.classList.contains('sub')&&pg.textContent.toLowerCase().includes(v));
+      a.classList.toggle('hide',!hit);
+    });
+  });
+  q.addEventListener('keydown',e=>{if(e.key==='Enter'){const f=nav.querySelector('a:not(.hide)');if(f)location.hash=f.getAttribute('href')}});
+  addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==q){e.preventDefault();q.focus()}});
+
+  /* mobile menu */
+  document.getElementById('menu').onclick=()=>nav.classList.toggle('open');
+
+  route();
+})();
+</script>
+</body>
+</html>
